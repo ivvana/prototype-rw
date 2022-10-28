@@ -1,0 +1,94 @@
+/// <обобщение>
+///Първо, ще създадем абстрактен клс SandwichPrototype (за прототипа)
+///и ще дефинираме Clone() метод
+///Инстанциите на този клас, ще могат да го използват, за да се клонират.
+/// </обобщение>
+abstract class SandwichPrototype
+{
+    public abstract SandwichPrototype Clone();
+}
+///Сега правим ConcretePrototype клас Sandwich
+///Той ще се клнира и ще създава много сандвичи
+class Sandwich : SandwichPrototype
+{
+  //хляб
+  private string Bread;
+  ///месо
+  private string Meat;
+  ///сирене
+  private string Cheese;
+  ///зеленчуци
+  private string Veggies;
+  
+  public Sandwich(string bread, string meat, string cheese, string veggies)
+    {
+        Bread = bread;
+        Meat = meat;
+        Cheese = cheese;
+        Veggies = veggies;
+    }
+
+    public override SandwichPrototype Clone()
+    {
+    ///визмаме "съставките"
+        string ingredientList = GetIngredientList();
+        Console.WriteLine("Клонираме сандвич със следните съставки: {0}", ingredientList.Remove(ingredientList.LastIndexOf(",")));
+
+        return MemberwiseClone() as SandwichPrototype;
+    }
+
+    private string GetIngredientList()
+    {
+        //...
+    }
+}
+
+///клас за Меню
+class SandwichMenu
+{
+    private Dictionary<string, SandwichPrototype> _sandwiches 
+        = new Dictionary<string, SandwichPrototype>();
+
+    public SandwichPrototype this[string name]
+    {
+        get { return _sandwiches[name]; }
+        set { _sandwiches.Add(name, value); }
+    }
+}
+///нашият Main метод ще играе ролята и на клиент
+class Program
+{
+    static void Main(string[] args)
+    {
+        SandwichMenu sandwichMenu = new SandwichMenu();
+
+        // Правим 3 основни сандвича 
+        sandwichMenu["бекон"] 
+            = new Sandwich("Ръжен", "бекон", "", "маруля, домат");
+        sandwichMenu["сладко"] 
+            = new Sandwich("бял", "", "", "ягодовосладко, сирене");
+        sandwichMenu["специален"] 
+            = new Sandwich("пълнозърнест", "пуешко", "чедър", "маруля, лук, домат");
+
+        // Някой от служителите си измисля 3 нови сандвича
+        sandwichMenu["заГладници"] 
+            = new Sandwich("ръжен", "телешко и бекон", "чедър", "маруля, домат, кисели краставици, лук");
+        sandwichMenu["Tроен"] 
+            = new Sandwich("пълнозърнест", "Пуешко ,шунка, шпеков", "рикота", "маруля, лук");
+            ///и разбира се, вегетарианска опция
+        sandwichMenu["Вегетариански"] 
+            = new Sandwich("бял", "", "", "маруля, лук, домат, маслини");
+
+        // клонираме ги
+        Sandwich sandwich1 = sandwichMenu["сладко"].Clone() as Sandwich;
+        Sandwich sandwich2 
+            = sandwichMenu["вегетариански"].Clone() as Sandwich;
+        Sandwich sandwich3 
+            = sandwichMenu["бекон"].Clone() as Sandwich;
+
+
+        ///тук вече, освен че имаме 6 сандвича в менюто, имаме и още 3(клонинга sandwich1,2,3) -> 9 сандвича
+        // чакаме клиента
+        Console.ReadKey();
+    }
+}
